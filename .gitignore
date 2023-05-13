@@ -1,0 +1,8 @@
+/vendor.protogen/
+# VSCode
+.vscode
+logs
+import
+data
+plugins
+conf
