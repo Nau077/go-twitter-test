@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/jmoiron/sqlx"
+	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 )
 
 type SubcribeRepository interface {
@@ -13,7 +13,7 @@ type SubcribeRepository interface {
 }
 
 type repository struct {
-	db *sqlx.DB
+	driver neo4j.DriverWithContext
 }
 
 type Subcription struct {
@@ -23,6 +23,7 @@ type Subcription struct {
 }
 
 func CreateSubcription(ctx context.Context) (int64, error) {
+
 	return 2, nil
 }
 
