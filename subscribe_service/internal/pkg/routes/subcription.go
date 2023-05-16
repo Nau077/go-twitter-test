@@ -1,21 +1,15 @@
 package routes
 
 import (
-	"time"
+	"context"
+	"go_subs_service/internal/services/subs_service"
 
-	"github.com/Nau077/cassandra-golang-sv/internal/services/post"
-	"github.com/gin-contrib/timeout"
 	"github.com/gin-gonic/gin"
 )
 
-func NewPostHTTPHandler(r *gin.Engine, s *post.Service) {
-	// handler := &HTTPPost{}
+func NewSubsHTTPHandler(ctx context.Context, r *gin.Engine, s *subs_service.Service) *gin.Engine {
+	xapi := r.Group("/")
+	api.POST("/CreateSubs", s.CreateSubs(ctx))
 
-	api := r.Group("/post")
-	api.GET("/", s.GetRandom)
-	api.POST("/add", timeout.New(
-		timeout.WithTimeout(4000*time.Millisecond),
-		// timeout.WithHandler(handler.InsertData),
-		// timeout.WithResponse(testResponse),
-	))
+	return r
 }

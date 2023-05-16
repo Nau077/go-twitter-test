@@ -2,22 +2,19 @@ package app
 
 import (
 	"context"
-	"go-twitter-test/subscribe_service/internal/pkg/db"
+	"go_subs_service/internal/config"
+	"go_subs_service/internal/pkg/db"
+	"go_subs_service/internal/repository"
+	"go_subs_service/internal/services/subs_service"
 	"log"
-
-	"github.com/zeromicro/go-zero/tools/goctl/config"
-	// "github.com/Nau077/golang-pet-first/internal/config"
-	// "github.com/Nau077/golang-pet-first/internal/pkg/db"
-	// repository "github.com/Nau077/golang-pet-first/internal/repository/note"
-	// "github.com/Nau077/golang-pet-first/internal/service/note"
 )
 
 type serviceProvider struct {
 	db             db.Client
 	configPath     string
 	config         *config.Config
-	noteRepository repository.Repository
-	noteService    *note.Service
+	subsRepository *repository.SubcribeRepository
+	subsService    *subs_service.Service
 }
 
 func newServiceProvider(configPath string) *serviceProvider {
@@ -26,7 +23,6 @@ func newServiceProvider(configPath string) *serviceProvider {
 	}
 }
 
-// GetDB
 func (s *serviceProvider) GetDB(ctx context.Context) db.Client {
 	if s.db == nil {
 		cfg, err := s.GetConfig().GetDBConfig()
@@ -44,7 +40,6 @@ func (s *serviceProvider) GetDB(ctx context.Context) db.Client {
 	return s.db
 }
 
-// GetConfig
 func (s *serviceProvider) GetConfig() *config.Config {
 	if s.config == nil {
 		cfg, err := config.NewConfig(s.configPath)
@@ -57,10 +52,9 @@ func (s *serviceProvider) GetConfig() *config.Config {
 	return s.config
 }
 
-// GetNoteRepository
 func (s *serviceProvider) GetNoteRepository(ctx context.Context) repository.Repository {
 	if s.noteRepository == nil {
-		s.noteRepository = repository.NewNoteRepository(s.GetDB(ctx))
+		s.noteRepository = repository.(s.GetDB(ctx))
 	}
 
 	return s.noteRepository

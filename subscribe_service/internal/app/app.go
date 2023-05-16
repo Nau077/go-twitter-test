@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"go_subs_service/internal/pkg/routes"
 	"log"
 	"net/http"
 	"sync"
@@ -10,8 +11,7 @@ import (
 )
 
 type App struct {
-	router *gin.Engine
-
+	router          *gin.Engine
 	serviceProvider *serviceProvider
 	pathConfig      string
 }
@@ -33,9 +33,10 @@ func (a *App) Run() error {
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 
-	err = a.runPublicHTTP(wg)
-	if err != nil {
-		return err
+	for err := range a.runPublicHTTP(wg) {
+		if err != nil {
+			return err
+		}
 	}
 
 	wg.Wait()
@@ -46,7 +47,6 @@ func (a *App) Run() error {
 func (a *App) initDeps(ctx context.Context) error {
 	inits := []func(context.Context) error{
 		a.initServiceProvider,
-		a.initServer,
 		a.initPublicHTTPHandlers,
 	}
 
@@ -66,29 +66,30 @@ func (a *App) initServiceProvider(_ context.Context) error {
 	return nil
 }
 
-func (a *App) initServer(ctx context.Context) error {
-	a.subscription = note_v1.NewNote(a.serviceProvider.GetNoteService(ctx))
+func (a *App) initPublicHTTPHandlers(ctx context.Context) error {
+	a.router = routes.NewSubsHTTPHandler(gin.Default(), a.serviceProvider.GetSubsService(ctx))
 
 	return nil
 }
 
-func (a *App) initPublicHTTPHandlers(ctx context.Context) {
-	gin.SetMode(gin.ReleaseMode)
-	a.routes.NewSubsHTTPHandler(r.router, r.subsService)
-}
+func (a *App) runPublicHTTP(wg *sync.WaitGroup) <-chan error {
+	resCh := make(chan error)
 
-func (a *App) runPublicHTTP(wg *sync.WaitGroup) error {
 	go func() {
-		defer wg.Done()
+		defer func() {
+			wg.Done()
+			close(resCh)
+		}()
 
-		a.router.Run(port)
 		port := a.serviceProvider.GetConfig().HTTP.GetPort()
+		a.router.Run(port)
 		if errHTTP := http.ListenAndServe(":"+port, a.router); errHTTP != nil {
-			return errHTTP
+			resCh <- errHTTP
+			return
 		}
 	}()
 
 	log.Printf("run http server on host %s", a.serviceProvider.GetConfig().HTTP.GetAddress())
 
-	return nil
+	return resCh
 }

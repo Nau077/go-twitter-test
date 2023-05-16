@@ -1,6 +1,6 @@
-package subcription
+package subs_service
 
-import "go-twitter-test/subscribe_service/internal/repository"
+import "go_subs_service/subscribe_service/internal/repository"
 
 type Service struct {
 	subscriptionRepository repository.SubcribeRepository
