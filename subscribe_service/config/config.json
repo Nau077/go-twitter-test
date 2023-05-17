@@ -1,0 +1,12 @@
+{
+    "db": {
+      "dsn": "neo4j://localhost",
+      "password": "",
+      "user": "letmein!",
+      "db": "neo4j"
+    },
+    "http": {
+        "host": "localhost",
+        "port":7002        
+    }
+}

@@ -6,11 +6,6 @@ import (
 	"os"
 )
 
-const (
-	dbPassEscSeq = "{password}"
-	password     = "note-service-password"
-)
-
 type HTTP struct {
 	Host string `json:"host"`
 	Port string `json:"port"`
@@ -21,8 +16,10 @@ func (h *HTTP) GetAddress() string {
 }
 
 type DB struct {
-	DSN                string `json:"dsn"`
-	MaxOpenConnections int32  `json:"max_open_connections"`
+	DSN  string `json:"dsn"`
+	USER string `json:"user"`
+	DB   string `json:"db"`
+	PASS string `json:"password"`
 }
 
 type Config struct {
@@ -30,7 +27,6 @@ type Config struct {
 	DB   DB   `json:"db"`
 }
 
-// new config
 func NewConfig(path string) (*Config, error) {
 	file, err := os.ReadFile(path)
 	if err != nil {
@@ -46,18 +42,7 @@ func NewConfig(path string) (*Config, error) {
 	return config, nil
 }
 
-// // Get db config
-// func (c *Config) GetDBConfig() (*pgxpool.Config, error) {
-// 	dbDsn := strings.ReplaceAll(c.DB.DSN, dbPassEscSeq, password)
+func (c *Config) GetDBConfig() *DB {
 
-// 	poolConfig, err := pgxpool.ParseConfig(dbDsn)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	poolConfig.ConnConfig.BuildStatementCache = nil
-// 	poolConfig.ConnConfig.PreferSimpleProtocol = true
-// 	poolConfig.MaxConns = c.DB.MaxOpenConnections
-
-// 	return poolConfig, nil
-// }
+	return &c.DB
+}

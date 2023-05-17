@@ -10,10 +10,10 @@ import (
 )
 
 type serviceProvider struct {
-	db             db.Client
+	db             *db.Client
 	configPath     string
 	config         *config.Config
-	subsRepository *repository.SubcribeRepository
+	subsRepository repository.SubcribeRepository
 	subsService    *subs_service.Service
 }
 
@@ -23,12 +23,9 @@ func newServiceProvider(configPath string) *serviceProvider {
 	}
 }
 
-func (s *serviceProvider) GetDB(ctx context.Context) db.Client {
+func (s *serviceProvider) GetDB(ctx context.Context) *db.Client {
 	if s.db == nil {
-		cfg, err := s.GetConfig().GetDBConfig()
-		if err != nil {
-			log.Fatalf("failed to get db config: %s", err.Error())
-		}
+		cfg := s.GetConfig().GetDBConfig()
 
 		dbc, err := db.NewClient(ctx, cfg)
 		if err != nil {
@@ -52,19 +49,18 @@ func (s *serviceProvider) GetConfig() *config.Config {
 	return s.config
 }
 
-func (s *serviceProvider) GetNoteRepository(ctx context.Context) repository.Repository {
-	if s.noteRepository == nil {
-		s.noteRepository = repository.(s.GetDB(ctx))
+func (s *serviceProvider) GetSubsRepository(ctx context.Context) repository.SubcribeRepository {
+	if s.subsRepository == nil {
+		s.subsRepository = repository.NewSubsRepository(s.GetDB(ctx))
 	}
 
-	return s.noteRepository
+	return s.subsRepository
 }
 
-// GetNoteService
-func (s *serviceProvider) GetNoteService(ctx context.Context) *note.Service {
-	if s.noteService == nil {
-		s.noteService = note.NewService(s.GetNoteRepository(ctx))
+func (s *serviceProvider) GetSubsService(ctx context.Context) *Subs.Service {
+	if s.SubsService == nil {
+		s.SubsService = Subs.NewService(s.GetSubsRepository(ctx))
 	}
 
-	return s.noteService
+	return s.SubsService
 }

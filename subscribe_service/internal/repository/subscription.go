@@ -17,7 +17,7 @@ type subsRepository struct {
 	driver neo4j.DriverWithContext
 }
 
-func NewSubsRepository(client db.Client) *subsRepository {
+func NewSubsRepository(client *db.Client) SubcribeRepository {
 	return &subsRepository{
 		driver: client.DB(),
 	}
@@ -29,15 +29,15 @@ type Subcription struct {
 	userSubsId string
 }
 
-func CreateSubcription(ctx context.Context) (int64, error) {
+func (s *subsRepository) CreateSubcription(ctx context.Context) (int64, error) {
 
 	return 2, nil
 }
 
-func CancelSubcription(ctx context.Context) (int64, error) {
-	return 2, nil
+func (s *subsRepository) CancelSubcription(ctx context.Context) error {
+	return nil
 }
 
-func GetSubcriptionList(ctx context.Context) error {
+func (s *subsRepository) GetSubcriptionList(ctx context.Context) error {
 	return nil
 }

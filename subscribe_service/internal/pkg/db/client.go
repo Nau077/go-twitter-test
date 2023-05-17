@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"go_subs_service/internal/config"
 
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 )
@@ -11,9 +12,8 @@ type Client struct {
 	closeFunc context.CancelFunc
 }
 
-func NewClient(ctx context.Context) (*Client, error) {
-	dbUri := "neo4j://localhost"
-	driver, err := neo4j.NewDriverWithContext(dbUri, neo4j.BasicAuth("neo4j", "letmein!", ""))
+func NewClient(ctx context.Context, cfg *config.DB) (*Client, error) {
+	driver, err := neo4j.NewDriverWithContext(cfg.DSN, neo4j.BasicAuth(cfg.DB, cfg.USER, cfg.PASS))
 	if err != nil {
 		panic(err)
 	}
