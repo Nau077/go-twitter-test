@@ -8,7 +8,7 @@ import (
 )
 
 func NewSubsHTTPHandler(ctx context.Context, r *gin.Engine, s *subs_service.Service) *gin.Engine {
-	xapi := r.Group("/")
+	api := r.Group("/")
 	api.POST("/CreateSubs", s.CreateSubs(ctx))
 
 	return r

@@ -2,9 +2,10 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 
-	"go_subs_service/internal"
+	"go_subs_service/internal/app"
 	// "os"
 	// "regexp"
 	// "github.com/gin-contrib/logger"
@@ -13,12 +14,18 @@ import (
 	// "github.com/rs/zerolog/log"
 )
 
-func main() {
-	staticPath := "./static" //os.Args[1]
-	ctx := context.Background()
-	a, err := internal.NewApp(ctx, staticPath)
+var pathConfig string
 
-	err = a.Run()
+func init() {
+	flag.StringVar(&pathConfig, "config", "./config/config.json", "Path to configuration file")
+}
+
+func main() {
+	flag.Parse()
+	ctx := context.Background()
+	a, err := app.NewApp(ctx, pathConfig)
+
+	err = a.Run(ctx)
 	if err != nil {
 		log.Fatalf("failed to run app %s", err.Error())
 	}

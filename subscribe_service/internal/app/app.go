@@ -12,7 +12,7 @@ import (
 
 type App struct {
 	router          *gin.Engine
-	serviceProvider *serviceProvider
+	serviceProvider *ServiceProvider
 	pathConfig      string
 }
 
@@ -25,9 +25,9 @@ func NewApp(ctx context.Context, pathConfig string) (*App, error) {
 	return a, err
 }
 
-func (a *App) Run() error {
+func (a *App) Run(ctx context.Context) error {
 	defer func() {
-		a.serviceProvider.db.Close()
+		a.serviceProvider.db.Close(ctx)
 	}()
 
 	wg := &sync.WaitGroup{}
@@ -67,7 +67,7 @@ func (a *App) initServiceProvider(_ context.Context) error {
 }
 
 func (a *App) initPublicHTTPHandlers(ctx context.Context) error {
-	a.router = routes.NewSubsHTTPHandler(gin.Default(), a.serviceProvider.GetSubsService(ctx))
+	a.router = routes.NewSubsHTTPHandler(ctx, gin.Default(), a.serviceProvider.GetSubsService(ctx))
 
 	return nil
 }

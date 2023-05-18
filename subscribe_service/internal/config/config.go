@@ -15,6 +15,14 @@ func (h *HTTP) GetAddress() string {
 	return net.JoinHostPort(h.Host, h.Port)
 }
 
+func (h *HTTP) GetPort() string {
+	if h.Port != "" {
+		return h.Port
+	}
+
+	return ""
+}
+
 type DB struct {
 	DSN  string `json:"dsn"`
 	USER string `json:"user"`

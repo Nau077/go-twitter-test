@@ -9,7 +9,7 @@ import (
 	"log"
 )
 
-type serviceProvider struct {
+type ServiceProvider struct {
 	db             *db.Client
 	configPath     string
 	config         *config.Config
@@ -17,13 +17,13 @@ type serviceProvider struct {
 	subsService    *subs_service.Service
 }
 
-func newServiceProvider(configPath string) *serviceProvider {
-	return &serviceProvider{
+func newServiceProvider(configPath string) *ServiceProvider {
+	return &ServiceProvider{
 		configPath: configPath,
 	}
 }
 
-func (s *serviceProvider) GetDB(ctx context.Context) *db.Client {
+func (s *ServiceProvider) GetDB(ctx context.Context) *db.Client {
 	if s.db == nil {
 		cfg := s.GetConfig().GetDBConfig()
 
@@ -37,7 +37,7 @@ func (s *serviceProvider) GetDB(ctx context.Context) *db.Client {
 	return s.db
 }
 
-func (s *serviceProvider) GetConfig() *config.Config {
+func (s *ServiceProvider) GetConfig() *config.Config {
 	if s.config == nil {
 		cfg, err := config.NewConfig(s.configPath)
 		if err != nil {
@@ -49,7 +49,7 @@ func (s *serviceProvider) GetConfig() *config.Config {
 	return s.config
 }
 
-func (s *serviceProvider) GetSubsRepository(ctx context.Context) repository.SubcribeRepository {
+func (s *ServiceProvider) GetSubsRepository(ctx context.Context) repository.SubcribeRepository {
 	if s.subsRepository == nil {
 		s.subsRepository = repository.NewSubsRepository(s.GetDB(ctx))
 	}
@@ -57,10 +57,10 @@ func (s *serviceProvider) GetSubsRepository(ctx context.Context) repository.Subc
 	return s.subsRepository
 }
 
-func (s *serviceProvider) GetSubsService(ctx context.Context) *Subs.Service {
-	if s.SubsService == nil {
-		s.SubsService = Subs.NewService(s.GetSubsRepository(ctx))
+func (s *ServiceProvider) GetSubsService(ctx context.Context) *subs_service.Service {
+	if s.subsService == nil {
+		s.subsService = subs_service.NewService(s.GetSubsRepository(ctx))
 	}
 
-	return s.SubsService
+	return s.subsService
 }

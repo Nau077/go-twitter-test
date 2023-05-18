@@ -7,6 +7,6 @@
     },
     "http": {
         "host": "localhost",
-        "port":7002        
+        "port":"7002"        
     }
 }
