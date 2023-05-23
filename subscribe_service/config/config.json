@@ -1,8 +1,8 @@
 {
     "db": {
       "dsn": "neo4j://localhost",
-      "password": "",
-      "user": "letmein!",
+      "password": "qwerty",
+      "user": "neo4j",
       "db": "neo4j"
     },
     "http": {

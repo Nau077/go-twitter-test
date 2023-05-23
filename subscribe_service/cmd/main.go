@@ -6,12 +6,6 @@ import (
 	"log"
 
 	"go_subs_service/internal/app"
-	// "os"
-	// "regexp"
-	// "github.com/gin-contrib/logger"
-	// "github.com/gin-gonic/gin"
-	// "github.com/rs/zerolog"
-	// "github.com/rs/zerolog/log"
 )
 
 var pathConfig string
