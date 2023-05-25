@@ -9,7 +9,9 @@ import (
 
 func NewSubsHTTPHandler(ctx context.Context, r *gin.Engine, s *subs_service.Service) *gin.Engine {
 	api := r.Group("/")
-	api.POST("/CreateSubs", s.CreateSubs(ctx))
+	api.POST("/subs", s.CreateSubs(ctx))
+	api.GET("/subsList", s.GetSubsList(ctx))
+	api.DELETE("/subs", s.CancelSub(ctx))
 
 	return r
 }

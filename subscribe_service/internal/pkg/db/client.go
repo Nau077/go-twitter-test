@@ -13,7 +13,7 @@ type Client struct {
 }
 
 func NewClient(ctx context.Context, cfg *config.DB) (*Client, error) {
-	driver, err := neo4j.NewDriverWithContext(cfg.DSN, neo4j.BasicAuth(cfg.DB, cfg.USER, cfg.PASS))
+	driver, err := neo4j.NewDriverWithContext(cfg.DSN, neo4j.BasicAuth(cfg.USER, cfg.PASS, ""))
 	if err != nil {
 		panic(err)
 	}

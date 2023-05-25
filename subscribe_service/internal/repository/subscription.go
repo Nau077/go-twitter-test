@@ -2,16 +2,15 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"go_subs_service/internal/pkg/db"
 
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 )
 
 type SubcribeRepository interface {
-	CreateSubscription(ctx context.Context, id string, subsId string) (*Subcription, error)
-	CancelSubcription(ctx context.Context) error
-	GetSubcriptionList(ctx context.Context) error
+	CreateSubscription(ctx context.Context, user1 string, user2 string) (string, error)
+	CancelSubcription(ctx context.Context, user string) (string, error)
+	GetSubcriptionList(ctx context.Context, user string) ([]interface{}, error)
 }
 
 type subsRepository struct {
@@ -29,32 +28,64 @@ type Subcription struct {
 	subsId string
 }
 
-func (s *subsRepository) CreateSubscription(ctx context.Context, id string, subsId string) (*Subcription, error) {
-	result, err := neo4j.ExecuteQuery(ctx, s.driver,
-		"CREATE (igor: Person {id: $id}), ($id) -[:IS_SUBSCRIBED]-> ($subsId)",
-		map[string]any{
-			"id":     id,
-			"subsId": subsId,
-		}, neo4j.EagerResultTransformer)
+func (s *subsRepository) CreateSubscription(ctx context.Context, user1 string, user2 string) (string, error) {
+	query := `
+		MERGE (u1:User {name: $user1})
+		MERGE (u2:User {name: $user2})
+		MERGE (u1)-[:IS_FRIEND]->(u2)
+	`
+
+	params := map[string]interface{}{
+		"user1": user1,
+		"user2": user2,
+	}
+
+	_, err := neo4j.ExecuteQuery(ctx, s.driver, query, params, neo4j.EagerResultTransformer)
+	if err != nil {
+		return "", err
+	} else {
+		return "success create response", nil
+	}
+
+}
+
+func (s *subsRepository) CancelSubcription(ctx context.Context, user string) (string, error) {
+	query := `
+		MATCH (u:User {name: $user})
+		DETACH DELETE u
+	`
+
+	params := map[string]interface{}{
+		"user": user,
+	}
+
+	_, err := neo4j.ExecuteQuery(ctx, s.driver, query, params, neo4j.EagerResultTransformer)
+	if err != nil {
+		return "", err
+	} else {
+		return "success delete response with " + user, nil
+	}
+}
+
+func (s *subsRepository) GetSubcriptionList(ctx context.Context, user string) ([]interface{}, error) {
+	query := `
+		MATCH (:User {name: $user})-[:IS_FRIEND]->(friend)
+		RETURN friend.name AS friendName
+	`
+
+	params := map[string]interface{}{
+		"user": user,
+	}
+
+	result, err := neo4j.ExecuteQuery(ctx, s.driver, query, params, neo4j.EagerResultTransformer)
 	if err != nil {
 		return nil, err
 	}
-	itemNode, _, err := neo4j.GetRecordValue[neo4j.Node](result.Records[0], "n")
-	if err != nil {
-		return nil, fmt.Errorf("could not find node n")
-	}
-	cId, err := neo4j.GetProperty[string](itemNode, id)
-	if err != nil {
-		return nil, err
+
+	var friends []interface{}
+	for _, record := range result.Records {
+		friends = append(friends, record)
 	}
 
-	return &Subcription{id: cId}, nil
-}
-
-func (s *subsRepository) CancelSubcription(ctx context.Context) error {
-	return nil
-}
-
-func (s *subsRepository) GetSubcriptionList(ctx context.Context) error {
-	return nil
+	return friends, nil
 }
