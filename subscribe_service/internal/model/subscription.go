@@ -1,6 +1,6 @@
 package model
 
 type SubsModel struct {
-	Id     string `json:"id" binding:"required"`
-	SubsId string `json:"subsId" binding:"required"`
+	User     string `json:"user" binding:"required"`
+	SubsUser string `json:"subsUser" binding:"required"`
 }

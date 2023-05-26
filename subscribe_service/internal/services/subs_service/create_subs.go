@@ -11,7 +11,7 @@ func (s *Service) CreateSubs(ctx context.Context) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var subsModel model.SubsModel
 		c.BindJSON(&subsModel)
-		id, err := s.subscriptionRepository.CreateSubscription(ctx, subsModel.Id, subsModel.SubsId)
+		id, err := s.subscriptionRepository.CreateSubscription(ctx, subsModel.User, subsModel.SubsUser)
 
 		if err != nil {
 			c.JSON(400, gin.H{

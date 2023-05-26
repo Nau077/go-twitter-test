@@ -3,9 +3,7 @@ package app
 import (
 	"context"
 	"go_subs_service/internal/pkg/routes"
-	"log"
 	"net/http"
-	"sync"
 
 	"github.com/gin-gonic/gin"
 )
@@ -30,16 +28,10 @@ func (a *App) Run(ctx context.Context) error {
 		a.serviceProvider.db.Close(ctx)
 	}()
 
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-
-	for err := range a.runPublicHTTP(wg) {
-		if err != nil {
-			return err
-		}
+	err := a.runPublicHTTP()
+	if err != nil {
+		return err
 	}
-
-	wg.Wait()
 
 	return nil
 }
@@ -72,24 +64,14 @@ func (a *App) initPublicHTTPHandlers(ctx context.Context) error {
 	return nil
 }
 
-func (a *App) runPublicHTTP(wg *sync.WaitGroup) <-chan error {
-	resCh := make(chan error)
+func (a *App) runPublicHTTP() error {
+	port := a.serviceProvider.GetConfig().HTTP.GetPort()
 
-	go func() {
-		defer func() {
-			wg.Done()
-			close(resCh)
-		}()
+	a.router.Run(port)
 
-		port := a.serviceProvider.GetConfig().HTTP.GetPort()
-		a.router.Run(port)
-		if errHTTP := http.ListenAndServe(":"+port, a.router); errHTTP != nil {
-			resCh <- errHTTP
-			return
-		}
-	}()
+	if errHTTP := http.ListenAndServe(":"+port, a.router); errHTTP != nil {
+		return errHTTP
+	}
 
-	log.Printf("run http server on host %s", a.serviceProvider.GetConfig().HTTP.GetAddress())
-
-	return resCh
+	return nil
 }
