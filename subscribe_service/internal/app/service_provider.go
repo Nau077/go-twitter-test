@@ -13,7 +13,7 @@ type ServiceProvider struct {
 	db             *db.Client
 	configPath     string
 	config         *config.Config
-	subsRepository repository.SubcribeRepository
+	subsRepository subs_service.SubcribeRepository
 	subsService    *subs_service.Service
 }
 
@@ -49,7 +49,7 @@ func (s *ServiceProvider) GetConfig() *config.Config {
 	return s.config
 }
 
-func (s *ServiceProvider) GetSubsRepository(ctx context.Context) repository.SubcribeRepository {
+func (s *ServiceProvider) GetSubsRepository(ctx context.Context) subs_service.SubcribeRepository {
 	if s.subsRepository == nil {
 		s.subsRepository = repository.NewSubsRepository(s.GetDB(ctx))
 	}

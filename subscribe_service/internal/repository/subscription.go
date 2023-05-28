@@ -3,21 +3,16 @@ package repository
 import (
 	"context"
 	"go_subs_service/internal/pkg/db"
+	"go_subs_service/internal/services/subs_service"
 
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 )
-
-type SubcribeRepository interface {
-	CreateSubscription(ctx context.Context, user1 string, user2 string) (string, error)
-	CancelSubcription(ctx context.Context, user string) (string, error)
-	GetSubcriptionList(ctx context.Context, user string) ([]interface{}, error)
-}
 
 type subsRepository struct {
 	driver neo4j.DriverWithContext
 }
 
-func NewSubsRepository(client *db.Client) SubcribeRepository {
+func NewSubsRepository(client *db.Client) subs_service.SubcribeRepository {
 	return &subsRepository{
 		driver: client.DB(),
 	}

@@ -8,4 +8,9 @@ run/server:
 
 .PHONY: run/db
 run/db:
-	docker-compose up neo4j
+	docker-compose up neo4j;
+
+.PHONY: run/test
+run/test:
+	@cd subscribe_service; \
+	exec go test -v ./...
